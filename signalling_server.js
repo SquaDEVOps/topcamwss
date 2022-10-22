@@ -33,7 +33,16 @@ let RTCPeerConfiguration = {
     accountSid: "AC9fc49f2daca960549355aaf9dcda8f1a",
     ttl: "86400",
     password: "fuhYUA7fRk1ctcwASvYTZW9cDwdxRo1bk3Bsvg5Lyh8="
-  }
+}
+
+app.use((req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Credentials", true);
+    res.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS, UPDATE");
+    res.set("Access-Control-Allow-Headers", "Origin, X-Request-With, Content-type, Accept");
+
+    next();
+});
 
 app.use(express.static(path.join(__dirname, './public')));
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')) });
