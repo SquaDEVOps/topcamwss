@@ -1,7 +1,20 @@
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 8081 }, () => {
-    console.log("Signalling server is now listening on port 8081");
+const express = require('express');
+const http = require('http');
+const path = require('path');
+
+
+const app = express();
+
+app.use(express.static(path.join(__dirname, './public')));
+app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')) });
+
+const httpServer = http.createServer(app);
+
+const wss = new WebSocket.Server({ server: httpServer }, () => {
+    console.log("Signalling server is now listening");
 });
+
 
 wss.broadcast = (ws, data) => {
     wss.clients.forEach((client) => {
@@ -27,3 +40,7 @@ wss.on('connection', ws => {
         console.log(`Client error. Total connected clients: ${wss.clients.size}`);
     });
 });
+
+const port = process.env.PORT || 3000;
+
+httpServer.listen(port, () => console.log(`server running: ${port}`))
