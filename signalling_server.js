@@ -2,12 +2,79 @@ const WebSocket = require('ws');
 const express = require('express');
 const http = require('http');
 const path = require('path');
-
-
 const app = express();
+let senderStream;
+let RTCPeerConfiguration = {
+    username: "3e1a4ec9ff39a03d5093c5fffe230c35a0c9eea8a2b4e5b092f38b6c2784ddf2",
+    iceServers: [
+        { 
+          url: "stun:global.stun.twilio.com:3478?transport=udp", 
+          urls: "stun:global.stun.twilio.com:3478?transport=udp" 
+        },
+        {
+            username: "3e1a4ec9ff39a03d5093c5fffe230c35a0c9eea8a2b4e5b092f38b6c2784ddf2",
+            credential: "fuhYUA7fRk1ctcwASvYTZW9cDwdxRo1bk3Bsvg5Lyh8=",
+            url: "turn:global.turn.twilio.com:3478?transport=udp",
+            urls: "turn:global.turn.twilio.com:3478?transport=udp"
+        },
+        {
+            url: "turn:global.turn.twilio.com:3478?transport=tcp",
+            username: "3e1a4ec9ff39a03d5093c5fffe230c35a0c9eea8a2b4e5b092f38b6c2784ddf2",
+            urls: "turn:global.turn.twilio.com:3478?transport=tcp",
+            credential: "fuhYUA7fRk1ctcwASvYTZW9cDwdxRo1bk3Bsvg5Lyh8="
+        },
+        {
+            url: "turn:global.turn.twilio.com:443?transport=tcp",
+            username: "3e1a4ec9ff39a03d5093c5fffe230c35a0c9eea8a2b4e5b092f38b6c2784ddf2",
+            urls: "turn:global.turn.twilio.com:443?transport=tcp",
+            credential: "fuhYUA7fRk1ctcwASvYTZW9cDwdxRo1bk3Bsvg5Lyh8="
+        },
+    ],
+    accountSid: "AC9fc49f2daca960549355aaf9dcda8f1a",
+    ttl: "86400",
+    password: "fuhYUA7fRk1ctcwASvYTZW9cDwdxRo1bk3Bsvg5Lyh8="
+  }
 
 app.use(express.static(path.join(__dirname, './public')));
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')) });
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.post("/consumer", async ({ body }, res) => {
+    const peer = new webrtc.RTCPeerConnection({
+        RTCPeerConfiguration
+    });
+    const desc = new webrtc.RTCSessionDescription(body.sdp);
+    await peer.setRemoteDescription(desc);
+    senderStream.getTracks().forEach(track => peer.addTrack(track, senderStream));
+    const answer = await peer.createAnswer();
+    await peer.setLocalDescription(answer);
+    const payload = {
+        sdp: peer.localDescription
+    }
+
+    res.json(payload);
+});
+
+app.post('/broadcast', async ({ body }, res) => {
+    const peer = new webrtc.RTCPeerConnection({
+        RTCPeerConfiguration
+    });
+    peer.ontrack = (e) => handleTrackEvent(e, peer);
+    const desc = new webrtc.RTCSessionDescription(body.sdp);
+    await peer.setRemoteDescription(desc);
+    const answer = await peer.createAnswer();
+    await peer.setLocalDescription(answer);
+    const payload = {
+        sdp: peer.localDescription
+    }
+
+    res.json(payload);
+});
+
+function handleTrackEvent(e, peer) {
+    senderStream = e.streams[0];
+};
 
 const httpServer = http.createServer(app);
 
