@@ -27,8 +27,9 @@ wss.broadcast = (ws, data) => {
 wss.on('connection', ws => {
     console.log(`Client connected. Total connected clients: ${wss.clients.size}`);
 
-    ws.on('message', message => {
+    ws.on('message', (data, isBinary) => {
         // msg = JSON.parse(message);
+        const message = isBinary ? data : data.toString();
         console.log(message + "\n\n");
         wss.broadcast(ws, message);
     });
