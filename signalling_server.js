@@ -9,6 +9,9 @@ let senderStream;
 let RTCPeerConfiguration = {
     username: "3e1a4ec9ff39a03d5093c5fffe230c35a0c9eea8a2b4e5b092f38b6c2784ddf2",
     iceServers: [
+        {
+            urls: "stun:stun2.1.google.com:19302"
+        },
         { 
           url: "stun:global.stun.twilio.com:3478?transport=udp", 
           urls: "stun:global.stun.twilio.com:3478?transport=udp" 
