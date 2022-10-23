@@ -1,5 +1,6 @@
 const WebSocket = require('ws');
 const express = require('express');
+const bodyParser = require('body-parser');
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
@@ -52,10 +53,10 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 app.use(express.static(path.join(__dirname, './public')));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')) });
 
 app.post('/consumer', async ({ body }, res) => {

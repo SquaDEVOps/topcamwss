@@ -4,6 +4,7 @@
   "description": "",
   "main": "signalling_server.js",
   "dependencies": {
+    "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "wrtc": "^0.4.7",
@@ -12,9 +13,12 @@
   "engines": {
     "node": "14.17.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
   "scripts": {
     "start": "node signalling_server.js",
+    "dev": "nodemon signalling_server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
