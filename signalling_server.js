@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
+const webrtc = require("wrtc");
 const app = express();
 let senderStream;
 let RTCPeerConfiguration = {
