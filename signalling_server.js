@@ -76,6 +76,11 @@ app.post('/broadcast', async ({ body }, res) => {
     res.json(payload);
 });
 
+
+function handleTrackEvent(e, peer) {
+    senderStream = e.streams[0];
+};
+
 app.post('/consumer', async ({ body }, res) => {
     console.log(body.sdp.type)
     const peer = new webrtc.RTCPeerConnection({
@@ -83,7 +88,7 @@ app.post('/consumer', async ({ body }, res) => {
     });
     const desc = new webrtc.RTCSessionDescription(body.sdp);
     await peer.setRemoteDescription(desc);
-    if(senderStream.getTracks() != undefined){
+    if(senderStream != undefined){
         senderStream.getTracks().forEach(track => {
             if(track != undefined) {
                 peer.addTrack(track, senderStream)
@@ -103,10 +108,6 @@ app.post('/consumer', async ({ body }, res) => {
     }
 
 });
-
-function handleTrackEvent(e, peer) {
-    senderStream = e.streams[0];
-};
 
 const httpServer = http.createServer(app);
 
