@@ -2,6 +2,7 @@ const WebSocket = require('ws');
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const cors = require('cors');
 const app = express();
 let senderStream;
 let RTCPeerConfiguration = {
@@ -34,6 +35,9 @@ let RTCPeerConfiguration = {
     ttl: "86400",
     password: "fuhYUA7fRk1ctcwASvYTZW9cDwdxRo1bk3Bsvg5Lyh8="
 }
+
+//CONFIGURATIONS CORS
+app.use(cors());
 
 app.use((req, res, next) => {
     res.set("Access-Control-Allow-Origin", "*");
