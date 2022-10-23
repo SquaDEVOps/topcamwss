@@ -49,10 +49,11 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(express.static(path.join(__dirname, './public')));
-app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')) });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, './public')));
+app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')) });
 
 app.post('/consumer', async ({ body }, res) => {
     const peer = new webrtc.RTCPeerConnection({
