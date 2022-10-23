@@ -76,7 +76,6 @@ app.post('/broadcast', async ({ body }, res) => {
     res.json(payload);
 });
 
-
 function handleTrackEvent(e, peer) {
     senderStream = e.streams[0];
 };
