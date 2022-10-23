@@ -78,6 +78,7 @@ app.post('/broadcast', async ({ body }, res) => {
 
 function handleTrackEvent(e, peer) {
     senderStream = e.streams[0];
+    console.log(senderStream, 'handleTrackEvent')
 };
 
 app.post('/consumer', async ({ body }, res) => {
@@ -95,11 +96,14 @@ app.post('/consumer', async ({ body }, res) => {
                 return res.status(400).json({ message: 'no broadcasting' });
             }
         });
+
         const answer = await peer.createAnswer();
         await peer.setLocalDescription(answer);
         const payload = {
             sdp: peer.localDescription
         }
+
+        console.log(peer?.sdp?.type, 'peer', payload, 'payload', senderStream, 'stream consumer')
     
         res.status(200).json(payload);
     } else {
@@ -107,6 +111,12 @@ app.post('/consumer', async ({ body }, res) => {
     }
 
 });
+
+app.get('/pausebroadcast', async ({ body }, res) => {
+    senderStream = undefined;
+    console.log(senderStream)
+    res.status(200).json({ message: `senderStream are cleaned` });
+})
 
 const httpServer = http.createServer(app);
 
