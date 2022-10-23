@@ -49,7 +49,7 @@ app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')) })
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post("/consumer", async ({ body }, res) => {
+app.post('/consumer', async ({ body }, res) => {
     const peer = new webrtc.RTCPeerConnection({
         RTCPeerConfiguration
     });
