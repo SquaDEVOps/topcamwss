@@ -6,7 +6,7 @@ const path = require('path');
 const cors = require('cors');
 const webrtc = require("wrtc");
 const app = express();
-let senderStream;
+var senderStream;
 let RTCPeerConfiguration = {
     username: "3e1a4ec9ff39a03d5093c5fffe230c35a0c9eea8a2b4e5b092f38b6c2784ddf2",
     iceServers: [
@@ -59,23 +59,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')) });
 
-app.post('/consumer', async ({ body }, res) => {
-    const peer = new webrtc.RTCPeerConnection({
-        RTCPeerConfiguration
-    });
-    const desc = new webrtc.RTCSessionDescription(body.sdp);
-    await peer.setRemoteDescription(desc);
-    senderStream.getTracks().forEach(track => peer.addTrack(track, senderStream));
-    const answer = await peer.createAnswer();
-    await peer.setLocalDescription(answer);
-    const payload = {
-        sdp: peer.localDescription
-    }
-
-    res.json(payload);
-});
-
 app.post('/broadcast', async ({ body }, res) => {
+    console.log(body.sdp.type)
     const peer = new webrtc.RTCPeerConnection({
         RTCPeerConfiguration
     });
@@ -89,6 +74,34 @@ app.post('/broadcast', async ({ body }, res) => {
     }
 
     res.json(payload);
+});
+
+app.post('/consumer', async ({ body }, res) => {
+    console.log(body.sdp.type)
+    const peer = new webrtc.RTCPeerConnection({
+        RTCPeerConfiguration
+    });
+    const desc = new webrtc.RTCSessionDescription(body.sdp);
+    await peer.setRemoteDescription(desc);
+    if(senderStream.getTracks() != undefined){
+        senderStream.getTracks().forEach(track => {
+            if(track != undefined) {
+                peer.addTrack(track, senderStream)
+            } else {
+                return res.status(400).json({ message: 'no broadcasting' });
+            }
+        });
+        const answer = await peer.createAnswer();
+        await peer.setLocalDescription(answer);
+        const payload = {
+            sdp: peer.localDescription
+        }
+    
+        res.status(200).json(payload);
+    } else {
+        res.status(400).json({ message: 'no tracking record' })
+    }
+
 });
 
 function handleTrackEvent(e, peer) {
